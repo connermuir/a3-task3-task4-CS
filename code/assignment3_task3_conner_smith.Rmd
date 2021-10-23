@@ -4,14 +4,14 @@ author: "Conner Smith"
 date: "10/22/2021"
 output: html_document
 ---
-## Overview 
+# **Overview** 
 
 The purpose of this task is to explore red and purple urchins recorded by Santa Barbara Coastal Long Term Ecological Research program divers.
 
 Data: Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin size frequency distribution ver 20. Environmental Data Initiative. https://doi.org/10.6073/pasta/5a1e9ef03aa47bd2225c0bb98a02a63b. 
 
 
-## Setup
+# **Setup**
 
 ```{r setup, include=FALSE, warning=FALSE, message=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE)
@@ -23,7 +23,7 @@ library(lubridate)
 library(kableExtra)
 ```
 
-## Raw Data
+# **Raw Data**
 
 ```{r}
 # Read in the raw urchins datam using relative file paths
@@ -31,7 +31,7 @@ library(kableExtra)
 urchins <- read_csv(here("data", "urchins.csv"))
 ```
 
-## Section 1
+# **Section 1**
 
 This section includes a visualization of the raw data after some initial steps were taken to clean up the data. 
 
@@ -43,7 +43,7 @@ urchins_clean <- urchins %>%
   mutate(date = mdy(date))
 ```
 
-### **Figure 1**: Santa Barbara Sea Urchin Size by Species
+#### **Figure 1**: Santa Barbara Sea Urchin Size by Species
 
 ```{r}
 # Visualize the urchin size with a faceted histogram. Change the number of bins, bin width, axis limits, and color options. 
@@ -65,7 +65,7 @@ ggplot(data = urchins_clean, aes(x = size)) +
 
 The data visualized above are presented below in a summary table
 
-### **Table 1**: Santa Barbara Sea Urchin Size Stats by Species
+#### **Table 1**: Santa Barbara Sea Urchin Size Stats by Species
 
 **Table 1: Santa Barbara Sea Urchin Size Stats by Species.** *This table provides summary statistics for Santa Barbara urchins by species. Roughly 30,000 samples of each species were collected.*
 
@@ -82,11 +82,15 @@ urchins_stats <- urchins_clean %>%
 
 urchins_stats %>% 
   kable(col.names = c("Species",
-                      "Mean Size",
-                      "Median Size",
-                      "Standard Deviation",
-                      "Sample Size")) %>% 
+                      "Mean Size (cm)",
+                      "Median Size (cm)",
+                      "Standard Deviation (cm)",
+                      "Sample Size"), digits = 2) %>% 
   kable_styling(full_width = FALSE)
 ```
 
 This summary shows that on average, the diameter of purple urchins is roughly 2.3 centimeters (or 34 percent) smaller than that of red urchins in Santa Barbara. The central tendency for the purple urchins and red urchins tends to 4.5 centimeters and 7 centimeters, respectively. There is greater spread in the size distribution of the red urchins sampled with a standard deviation of 1.9. The spread of purple urchin size is clustered more closely around the mean size of 4.5 centimeters. 
+
+# **Section 2**
+
+
