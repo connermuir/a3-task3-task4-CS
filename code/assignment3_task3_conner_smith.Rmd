@@ -6,7 +6,7 @@ output: html_document
 ---
 # **Overview** 
 
-The purpose of this task is to explore red and purple urchins recorded by Santa Barbara Coastal Long Term Ecological Research program divers.
+The purpose of this task is to explore red and purple urchins recorded by Santa Barbara Coastal Long Term Ecological Research program divers. In this task, the size differences between these two primary species are explored and explained. The data is then parsed by observation reef where counts of purple urchins are taken over the period between 2008 and 2020 to identify any possible shifts in the urchin population across sites. 
 
 Data: Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin size frequency distribution ver 20. Environmental Data Initiative. https://doi.org/10.6073/pasta/5a1e9ef03aa47bd2225c0bb98a02a63b. 
 
@@ -14,7 +14,7 @@ Data: Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin 
 # **Setup**
 
 ```{r setup, include=FALSE, warning=FALSE, message=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 # Attach packages
 library(tidyverse)
 library(here)
@@ -93,4 +93,51 @@ This summary shows that on average, the diameter of purple urchins is roughly 2.
 
 # **Section 2**
 
+This section includes some data reformatting  
 
+```{r}
+# Filter the data to show only purple urchins and create new columns for year and full site names 
+
+purple_urchins <- urchins_clean %>%
+  filter(common_name == "Purple Urchin") %>% 
+  mutate(date = as.Date(date)) %>% 
+  mutate(year = year(date)) %>% 
+  mutate(name_full = case_when(site == "AQUE" ~ "Arroyo Quemado Reef",
+                               site == "CARP" ~ "Carpinteria Reef",
+                               site == "IVEE" ~ "Isla Vista Reef",
+                               site == "MOHK" ~ "Mohawk Reef",
+                               site == "NAPL" ~ "Naples Reef"))
+```
+
+The following graph draws from a data frame summarizing the filtered data. 
+
+```{r}
+# Make a new data frame with the filtered data set showing total number of urchins by site and year. Do not show in the knitted document. 
+
+purple_urchins_summary <- purple_urchins %>%
+  group_by(name_full, year) %>% 
+  summarize(urchin_count = n()) 
+  
+```
+
+#### **Figure 2**: Purple Sea Urchin Count By Station (2008-2020)
+
+```{r}
+# Create a finalized graph showing this summarized data. 
+
+ggplot(data = purple_urchins_summary, aes(x = year, y = urchin_count)) +
+  geom_col(aes(fill = name_full), 
+           width = 0.5, show.legend = FALSE) +
+  scale_fill_manual(values = c("mediumpurple3", 
+                               "seagreen","tomato2", 
+                               "gold1", "sienna1")) +
+  facet_wrap(~ name_full) +
+  labs(x = "Year", y = "Urchin Count", 
+       title = "Urchin Count by Station (2008-2020)")
+```
+
+**Figure 2: Purple Sea Urchin Count By Station (2008-2020).** *These data describe the count of purple sea urchins across the five study stations between 2008 and 2020.*
+
+Without considering additional factors, this graph appears to show a decline in the number of urchins observed across the sites over this time period. In each of the sites besides Isla Vista Reef where observation only began in 2012, urchin observations peaked between 2008 and 2012. To determine if these changes reflect actual changes in population, one would have to be sure that the conditions of observation (i.e. time spent observing). It would also be helpful to identify any external variables like shifting environmental conditions that could justify the theory that urchin populations are declining in Santa Barbara. Otherwise, these declines could be tied to the study design or methods and not reflective of population shifts. 
+
+## End Task 3
