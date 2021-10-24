@@ -1,0 +1,126 @@
+---
+title: "Task 4 - Naples Reef Urchins"
+author: "Conner Smith"
+date: "10/24/2021"
+output: html_document
+---
+# **Overview**
+
+This task takes a closer look at Purple Urchin observations on Naples Reef in 2010. Specifically, it compared differences between the control group and the experimental group. In the latter group, giant kelp was removed once per year in winter at specific plots to simulate the effects of winter storm disturbance. The differences between these groups of urchins is explored below. 
+
+Data: Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin size frequency distribution ver 20. Environmental Data Initiative. https://doi.org/10.6073/pasta/5a1e9ef03aa47bd2225c0bb98a02a63b. 
+
+
+# **Setup**
+
+```{r setup, include=TRUE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+# Attach packages
+
+library(tidyverse)
+library(here)
+library(janitor)
+library(lubridate)
+library(kableExtra)
+```
+
+# **Retrieve Data**
+
+Pull in data frames created in Task 3. 
+
+```{r}
+# Retrieve the cleaned data from the data frames created in Task 3.
+
+urchins <- read_csv(here("data", "urchins.csv"))
+
+urchins_clean <- urchins %>% 
+  clean_names() %>% 
+  mutate(date = mdy(date))
+
+purple_urchins <- urchins_clean %>%
+  filter(common_name == "Purple Urchin") %>% 
+  rename(date_new = date) %>% 
+  mutate(date_new = as.Date(date_new)) %>% 
+  mutate(year = year(date_new))
+```
+
+# **Naples Data**
+
+Consolidate data to show only Naples purple urchin observations from 2010. 
+
+```{r}
+# Filter data for 2010, only purple urchins, at Naples Reef 
+
+purple_urchins_naples <- purple_urchins %>% 
+  filter(site == "NAPL") %>% 
+  filter(year == 2010)
+  
+```
+
+Plot data comparing control group to experimental group with regards to kelp removal. 
+
+```{r}
+# Plot the data using a faceted histogram broken out by treatment.
+
+ggplot(data = purple_urchins_naples, aes(x = size)) +
+  geom_histogram(aes(fill = treatment), show.legend = FALSE) +
+  facet_wrap(~ treatment) +
+  labs(x = "Urchin Size (cm)", y = "Urchin Count",
+       title = "Naples Reef Urchin Size by Treatment (2010)")
+```
+
+Explore the distribution of this data frame using QQ plots.
+
+```{r}
+# Make a qq plot for a subset of the data only showing the CONTROL treatment
+
+naples_control <- purple_urchins_naples %>% 
+  filter(treatment == "CONTROL")
+
+qqnorm(naples_control$size, ylab = "Urchin Size (cm)",
+       main = "Naples Urchin Size QQ Distribution (Control)",
+       col = "cadetblue")
+qqline(naples_control$size, col = "coral2") 
+```
+
+```{r}
+# Make a qq plot for a subset of the data only showing the ANNUAL treatment
+
+naples_annual <- purple_urchins_naples %>% 
+  filter(treatment == "ANNUAL")
+
+qqnorm(naples_annual$size, ylab = "Urchin Size (cm)",
+       main = "Naples Urchin Size QQ Distribution (Annual Kelp Treatment)",
+       col = "cadetblue")
+qqline(naples_annual$size, col = "coral2") 
+```
+
+**Takeaways**
+Overall, there were some minor differences between the urchin populations at Naples Reef in 2010, two years after the kelp removal experiemnt began. The urchins in the site where kelp was removed tended to be smaller with a central tendency skewed towards a size of 3 cm. For the control urchins, the sizes tended to be distributed more normally and clustered around 4 cm. Kelp is a major food source for urchins, providing one possible explanation for the impact of kelp removal on urchin size. 
+
+# **Summary Statistics**
+
+Create a summary table comparing the treatment and control groups by several statistics. 
+
+#### **Table 1**: Naples Reef Sea Urchin Size Stats by Treatment
+
+**Table 1: Naples Reef Sea Urchin Size Stats by Treatment.** *This table provides summary statistics for Naples Reef purple urchins by treatment in 2010. This shows that urchins in the control group had a slightly larger average size compared to the annual removal group.*
+
+```{r}
+naples_stats <- purple_urchins_naples %>% 
+  group_by(treatment) %>% 
+  summarize(sample_size = n(),
+            mean_size = mean(size, na.rm = TRUE),
+            median_size = median(size),
+            sd_size = sd(size))
+
+
+naples_stats %>% 
+  kable(col.names = c("Treatment",
+                      "Sample Size",
+                      "Mean Size (cm)",
+                      "Median Size (cm)",
+                      "Standard Deviation (cm)"), digits = 2) %>% 
+  kable_styling(full_width = FALSE)
+```
+
