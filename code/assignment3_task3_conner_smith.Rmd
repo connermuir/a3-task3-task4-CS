@@ -74,18 +74,18 @@ The data visualized above are presented below in a summary table
 
 urchins_stats <- urchins_clean %>% 
   group_by(common_name) %>% 
-  summarize(mean_size = mean(size, na.rm = TRUE),
+  summarize(sample_size = n(),
+            mean_size = mean(size, na.rm = TRUE),
             median_size = median(size),
-            sd_size = sd(size),
-            sample_size = n())
+            sd_size = sd(size))
 
 
 urchins_stats %>% 
   kable(col.names = c("Species",
+                      "Sample Size",
                       "Mean Size (cm)",
                       "Median Size (cm)",
-                      "Standard Deviation (cm)",
-                      "Sample Size"), digits = 2) %>% 
+                      "Standard Deviation (cm)"), digits = 2) %>% 
   kable_styling(full_width = FALSE)
 ```
 
@@ -93,15 +93,16 @@ This summary shows that on average, the diameter of purple urchins is roughly 2.
 
 # **Section 2**
 
-This section includes some data reformatting  
+This section includes some data reformatting and a graph 
 
 ```{r}
 # Filter the data to show only purple urchins and create new columns for year and full site names 
 
 purple_urchins <- urchins_clean %>%
   filter(common_name == "Purple Urchin") %>% 
-  mutate(date = as.Date(date)) %>% 
-  mutate(year = year(date)) %>% 
+  rename(date_new = date) %>% 
+  mutate(date_new = as.Date(date_new)) %>% 
+  mutate(year = year(date_new)) %>% 
   mutate(name_full = case_when(site == "AQUE" ~ "Arroyo Quemado Reef",
                                site == "CARP" ~ "Carpinteria Reef",
                                site == "IVEE" ~ "Isla Vista Reef",
@@ -132,12 +133,13 @@ ggplot(data = purple_urchins_summary, aes(x = year, y = urchin_count)) +
                                "seagreen","tomato2", 
                                "gold1", "sienna1")) +
   facet_wrap(~ name_full) +
+  theme_bw() +
   labs(x = "Year", y = "Urchin Count", 
        title = "Urchin Count by Station (2008-2020)")
 ```
 
 **Figure 2: Purple Sea Urchin Count By Station (2008-2020).** *These data describe the count of purple sea urchins across the five study stations between 2008 and 2020.*
 
-Without considering additional factors, this graph appears to show a decline in the number of urchins observed across the sites over this time period. In each of the sites besides Isla Vista Reef where observation only began in 2012, urchin observations peaked between 2008 and 2012. To determine if these changes reflect actual changes in population, one would have to be sure that the conditions of observation (i.e. time spent observing). It would also be helpful to identify any external variables like shifting environmental conditions that could justify the theory that urchin populations are declining in Santa Barbara. Otherwise, these declines could be tied to the study design or methods and not reflective of population shifts. 
+Without considering additional factors, this graph appears to show a decline in the number of urchins observed across the sites over this time period. In each of the sites besides Isla Vista Reef where observation only began in 2012, urchin observations peaked between 2008 and 2012. To determine if these changes reflect actual changes in the population, one would have to be sure that the sample is an accurate representation. For example, it is possible that only the urchins in these locations were declining while they were increasing elsewhere. To get a better sense of how representative this sample is, researchers could calculate a confidence interval on various characteristics of the urchins. It would also be helpful to identify any additional variables like shifting environmental conditions at specific locations or study design differences that could help justify the theory that urchin populations are declining in Santa Barbara. Otherwise, these declines may not be reflective of population shifts. 
 
 ## End Task 3
