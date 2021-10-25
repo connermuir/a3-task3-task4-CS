@@ -13,7 +13,7 @@ Data: Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin 
 
 # **Setup**
 
-```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+```{r setup, include=TRUE, warning=FALSE, message=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 # Attach packages
 library(tidyverse)
@@ -124,16 +124,16 @@ purple_urchins_summary <- purple_urchins %>%
 #### **Figure 2**: Purple Sea Urchin Count By Station (2008-2020)
 
 ```{r}
-# Create a finalized graph showing this summarized data. 
-
 ggplot(data = purple_urchins_summary, aes(x = year, y = urchin_count)) +
   geom_col(aes(fill = name_full), 
-           width = 0.5, show.legend = FALSE) +
-  scale_fill_manual(values = c("mediumpurple3", 
-                               "seagreen","tomato2", 
-                               "gold1", "sienna1")) +
-  facet_wrap(~ name_full) +
+           width = 0.75, 
+           position = "dodge",
+           show.legend = TRUE) +
+  scale_fill_manual(values = c("yellowgreen","darkseagreen4", "skyblue3", 
+                               "thistle3", "mediumpurple3")) +
   theme_bw() +
+  theme(legend.position = "bottom") +
+  theme(legend.title = element_blank())+
   labs(x = "Year", y = "Urchin Count", 
        title = "Urchin Count by Station (2008-2020)")
 ```
