@@ -63,8 +63,11 @@ Plot data comparing control group to experimental group with regards to kelp rem
 # Plot the data using a faceted histogram broken out by treatment.
 
 ggplot(data = purple_urchins_naples, aes(x = size)) +
-  geom_histogram(aes(fill = treatment), show.legend = FALSE) +
+  geom_histogram(aes(fill = treatment), binwidth = 0.25,
+                 show.legend = FALSE) +
+  scale_fill_manual(values = c("cadetblue", "mediumpurple")) +
   facet_wrap(~ treatment) +
+  theme_bw() +
   labs(x = "Urchin Size (cm)", y = "Urchin Count",
        title = "Naples Reef Urchin Size by Treatment (2010)")
 ```
@@ -74,28 +77,19 @@ Explore the distribution of this data frame using QQ plots.
 ```{r}
 # Make a qq plot for a subset of the data only showing the CONTROL treatment
 
-naples_control <- purple_urchins_naples %>% 
-  filter(treatment == "CONTROL")
+ggplot(data = purple_urchins_naples, aes(sample = size)) +
+  geom_qq(aes(color = treatment),
+              show.legend = FALSE) +
+  scale_color_manual(values = c("cadetblue", "mediumpurple")) +
+  facet_wrap(~ treatment) +
+  theme_bw() +
+  labs(x = "Quantiles", y ="Urchin Size",
+       title = "Naples Urchin Size Distribution (2010)")
 
-qqnorm(naples_control$size, ylab = "Urchin Size (cm)",
-       main = "Naples Urchin Size QQ Distribution (Control)",
-       col = "cadetblue")
-qqline(naples_control$size, col = "coral2") 
-```
-
-```{r}
-# Make a qq plot for a subset of the data only showing the ANNUAL treatment
-
-naples_annual <- purple_urchins_naples %>% 
-  filter(treatment == "ANNUAL")
-
-qqnorm(naples_annual$size, ylab = "Urchin Size (cm)",
-       main = "Naples Urchin Size QQ Distribution (Annual Kelp Treatment)",
-       col = "cadetblue")
-qqline(naples_annual$size, col = "coral2") 
 ```
 
 **Takeaways**
+
 Overall, there were some minor differences between the urchin populations at Naples Reef in 2010, two years after the kelp removal experiemnt began. The urchins in the site where kelp was removed tended to be smaller with a central tendency skewed towards a size of 3 cm. For the control urchins, the sizes tended to be distributed more normally and clustered around 4 cm. Kelp is a major food source for urchins, providing one possible explanation for the impact of kelp removal on urchin size. 
 
 # **Summary Statistics**
