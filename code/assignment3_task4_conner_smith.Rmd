@@ -2,11 +2,14 @@
 title: "Task 4 - Naples Reef Urchins"
 author: "Conner Smith"
 date: "10/24/2021"
-output: html_document
+output: 
+  html_document: 
+    toc: yes
+    theme: flatly
 ---
 # **Overview**
 
-This task takes a closer look at Purple Urchin observations on Naples Reef in 2010. Specifically, it compared differences between the control group and the experimental group. In the latter group, giant kelp was removed once per year in winter at specific plots to simulate the effects of winter storm disturbance. The differences between these groups of urchins is explored below. 
+This task takes a closer look at Purple Urchin observations on Naples Reef in 2010. Specifically, it compares differences between the control group and the experimental group. In the latter group, giant kelp was removed once per year in winter at specific plots to simulate the effects of winter storm disturbance. The differences between these groups of urchins is explored below. 
 
 Data: Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin size frequency distribution ver 20. Environmental Data Initiative. https://doi.org/10.6073/pasta/5a1e9ef03aa47bd2225c0bb98a02a63b. 
 
@@ -15,7 +18,7 @@ Data: Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin 
 
 ```{r setup, include=TRUE, message=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
-# Attach packages
+# Attach packages.
 
 library(tidyverse)
 library(here)
@@ -26,7 +29,7 @@ library(kableExtra)
 
 # **Retrieve Data**
 
-Pull in data frames created in Task 3. 
+The below code is copied from Task 3 to replicate the same, clean data frames. 
 
 ```{r}
 # Retrieve the cleaned data from the data frames created in Task 3.
@@ -46,10 +49,10 @@ purple_urchins <- urchins_clean %>%
 
 # **Naples Data**
 
-Consolidate data to show only Naples purple urchin observations from 2010. 
+Consolidate data using `filter` to show only Naples purple urchin observations from 2010. 
 
 ```{r}
-# Filter data for 2010, only purple urchins, at Naples Reef 
+# Filter data for 2010, only purple urchins, at Naples Reef.
 
 purple_urchins_naples <- purple_urchins %>% 
   filter(site == "NAPL") %>% 
@@ -57,10 +60,10 @@ purple_urchins_naples <- purple_urchins %>%
   
 ```
 
-Plot data comparing control group to experimental group with regards to kelp removal. 
+The data is plotted below in a faceted histogram showing both treatment methods - comparing control group to experimental group ("ANNUAL") which was located in the plots where kelp was removal. 
 
 ```{r}
-# Plot the data using a faceted histogram broken out by treatment.
+# Plot the data using a faceted histogram broken out by treatment. Update the colors and the bin width. 
 
 ggplot(data = purple_urchins_naples, aes(x = size)) +
   geom_histogram(aes(fill = treatment), binwidth = 0.25,
@@ -72,10 +75,10 @@ ggplot(data = purple_urchins_naples, aes(x = size)) +
        title = "Naples Reef Urchin Size by Treatment (2010)")
 ```
 
-Explore the distribution of this data frame using QQ plots.
+The data was then explored with `geom_qq()` to observe the distribution of this data frame. The control group appears to display relatively normal distribution while the treatment group is skewed slightly towards smaller sizes. 
 
 ```{r}
-# Make a qq plot for a subset of the data only showing the CONTROL treatment
+# Make a qq plot for the data faceted by treatmnent.
 
 ggplot(data = purple_urchins_naples, aes(sample = size)) +
   geom_qq(aes(color = treatment),
@@ -90,17 +93,19 @@ ggplot(data = purple_urchins_naples, aes(sample = size)) +
 
 **Takeaways**
 
-Overall, there were some minor differences between the urchin populations at Naples Reef in 2010, two years after the kelp removal experiemnt began. The urchins in the site where kelp was removed tended to be smaller with a central tendency skewed towards a size of 3 cm. For the control urchins, the sizes tended to be distributed more normally and clustered around 4 cm. Kelp is a major food source for urchins, providing one possible explanation for the impact of kelp removal on urchin size. 
+Overall, there were some minor differences between the urchin populations at Naples Reef in 2010, two years after the kelp removal experiment began. The urchins in the site where kelp was removed tended to be smaller with a central tendency skewed towards a size of 3 cm. For the control urchins, the sizes tended to be distributed more normally and clustered around 4 cm. Kelp is a major food source for urchins, providing one possible explanation for the impact of kelp removal on urchin size. 
 
 # **Summary Statistics**
 
-Create a summary table comparing the treatment and control groups by several statistics. 
+Create a summary table using `kable()` comparing the treatment and control groups by several statistics including sample size, mean, median, and standard deviation.
 
-#### **Table 1**: Naples Reef Sea Urchin Size Stats by Treatment
+### **Table 1**: Naples Reef Sea Urchin Size Stats by Treatment
 
 **Table 1: Naples Reef Sea Urchin Size Stats by Treatment.** *This table provides summary statistics for Naples Reef purple urchins by treatment in 2010. This shows that urchins in the control group had a slightly larger average size compared to the annual removal group.*
 
 ```{r}
+# Create a table using the kable() command after generating summary statistics for the consolidated data. 
+
 naples_stats <- purple_urchins_naples %>% 
   group_by(treatment) %>% 
   summarize(sample_size = n(),
@@ -118,3 +123,5 @@ naples_stats %>%
   kable_styling(full_width = FALSE)
 ```
 
+
+# **End Task 4**
