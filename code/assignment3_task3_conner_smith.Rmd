@@ -2,7 +2,10 @@
 title: "Task 3 - Santa Barbara Urchins"
 author: "Conner Smith"
 date: "10/22/2021"
-output: html_document
+output: 
+  html_document: 
+    toc: yes
+    theme: flatly
 ---
 # **Overview** 
 
@@ -15,7 +18,8 @@ Data: Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin 
 
 ```{r setup, include=TRUE, warning=FALSE, message=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
-# Attach packages
+# Attach packages.
+
 library(tidyverse)
 library(here)
 library(janitor)
@@ -26,24 +30,24 @@ library(kableExtra)
 # **Raw Data**
 
 ```{r}
-# Read in the raw urchins datam using relative file paths
+# Read in the raw urchins data using relative file paths.
 
 urchins <- read_csv(here("data", "urchins.csv"))
 ```
 
 # **Section 1**
 
-This section includes a visualization of the raw data after some initial steps were taken to clean up the data. 
+This section includes a faceted histogram and a summary statistics table - using `kable()` - of the urchins data showing the size patterns of both species across all observation sites and years. Initial steps were taken to clean up the data using `cleannames()` and `mdy`. 
 
 ```{r}
-# Convert all column names to lower snake case and standardize the date formatting
+# Convert all column names to lower_snake_case and standardize the date formatting. 
 
 urchins_clean <- urchins %>% 
   clean_names() %>% 
   mutate(date = mdy(date))
 ```
 
-#### **Figure 1**: Santa Barbara Sea Urchin Size by Species
+### **Figure 1**: Santa Barbara Sea Urchin Size by Species
 
 ```{r}
 # Visualize the urchin size with a faceted histogram. Change the number of bins, bin width, axis limits, and color options. 
@@ -61,16 +65,15 @@ ggplot(data = urchins_clean, aes(x = size)) +
   
 ```
 
-**Figure 1: Santa Barbara Sea Urchin Size by Species.** *These data describe the size distribution of red and purple sea urchins at SBC LTER long-term kelp removal experiment sites. Sea urchin size was measured to the nearest 0.5 cm.*
+**Figure 1: Santa Barbara Sea Urchin Size by Species.** *These data describe the size distribution of red and purple sea urchins at SBC LTER long-term kelp removal experiment sites. Sea urchin diameter size was measured to the nearest 0.5 cm.*
 
-The data visualized above are presented below in a summary table
 
-#### **Table 1**: Santa Barbara Sea Urchin Size Stats by Species
+### **Table 1**: Santa Barbara Sea Urchin Size Stats by Species
 
-**Table 1: Santa Barbara Sea Urchin Size Stats by Species.** *This table provides summary statistics for Santa Barbara urchins by species. Roughly 30,000 samples of each species were collected.*
+**Table 1: Santa Barbara Sea Urchin Size Stats by Species.** *This table provides summary statistics for Santa Barbara urchins by species. Roughly 30,000 samples of each species were collected, demonstrating that red urchins are larger on average.*
 
 ```{r}
-# Create a summary table of the mean, median, sample size, and standard deviation of the data after grouping by species. 
+# Use `summarize()` the mean, median, sample size, and standard deviation of the data after grouping by species. Then use the `kable()` command to create a finalized table. 
 
 urchins_stats <- urchins_clean %>% 
   group_by(common_name) %>% 
@@ -89,14 +92,14 @@ urchins_stats %>%
   kable_styling(full_width = FALSE)
 ```
 
-This summary shows that on average, the diameter of purple urchins is roughly 2.3 centimeters (or 34 percent) smaller than that of red urchins in Santa Barbara. The central tendency for the purple urchins and red urchins tends to 4.5 centimeters and 7 centimeters, respectively. There is greater spread in the size distribution of the red urchins sampled with a standard deviation of 1.9. The spread of purple urchin size is clustered more closely around the mean size of 4.5 centimeters. 
+This summary shows that on average, the diameter of purple urchins is roughly 2.3 centimeters (or 34 percent) smaller than that of red urchins in Santa Barbara. The data for both species appears to be generally centered around the mean size for each species. There is greater spread in the size distribution of the red urchins sampled with a standard deviation of 1.9. The spread of purple urchin size is clustered more closely around the mean size of 4.5 centimeters. 
 
 # **Section 2**
 
-This section includes some data reformatting and a graph 
+This section includes some data reformatting using `case_when()` to convert abbreviated names of site locations to full names. Year of observation is also separated out into a new column using `filter`. The data is summarized and visualized in a clustered bar graph to show the number of purple urchin observations at each site between 2008 and 2020.
 
 ```{r}
-# Filter the data to show only purple urchins and create new columns for year and full site names 
+# Filter the data to show only purple urchins and create new columns for year and full site names.
 
 purple_urchins <- urchins_clean %>%
   filter(common_name == "Purple Urchin") %>% 
@@ -110,7 +113,7 @@ purple_urchins <- urchins_clean %>%
                                site == "NAPL" ~ "Naples Reef"))
 ```
 
-The following graph draws from a data frame summarizing the filtered data. 
+The following clustered bar graph draws from a data frame summarizing the filtered data. 
 
 ```{r}
 # Make a new data frame with the filtered data set showing total number of urchins by site and year. Do not show in the knitted document. 
@@ -121,9 +124,13 @@ purple_urchins_summary <- purple_urchins %>%
   
 ```
 
-#### **Figure 2**: Purple Sea Urchin Count By Station (2008-2020)
+### **Figure 2**: Purple Sea Urchin Count By Station (2008-2020)
 
 ```{r}
+# Use geom_col() with position set to "dodge" to create a clustered bar graph of the purple_urchins_summary data.
+
+# Noting that facet wrapping with histograms here looks messy as there are 5 sites. The clustered bar graph shows these trends more clearly.  
+
 ggplot(data = purple_urchins_summary, aes(x = year, y = urchin_count)) +
   geom_col(aes(fill = name_full), 
            width = 0.75, 
@@ -138,8 +145,8 @@ ggplot(data = purple_urchins_summary, aes(x = year, y = urchin_count)) +
        title = "Urchin Count by Station (2008-2020)")
 ```
 
-**Figure 2: Purple Sea Urchin Count By Station (2008-2020).** *These data describe the count of purple sea urchins across the five study stations between 2008 and 2020.*
+**Figure 2: Purple Sea Urchin Count By Station (2008-2020).** *These data describe the count of purple sea urchins across the five study stations between 2008 and 2020. There is an overall decline in number of urchins observed from 2009 to 2020.*
 
-Without considering additional factors, this graph appears to show a decline in the number of urchins observed across the sites over this time period. In each of the sites besides Isla Vista Reef where observation only began in 2012, urchin observations peaked between 2008 and 2012. To determine if these changes reflect actual changes in the population, one would have to be sure that the sample is an accurate representation. For example, it is possible that only the urchins in these locations were declining while they were increasing elsewhere. To get a better sense of how representative this sample is, researchers could calculate a confidence interval on various characteristics of the urchins. It would also be helpful to identify any additional variables like shifting environmental conditions at specific locations or study design differences that could help justify the theory that urchin populations are declining in Santa Barbara. Otherwise, these declines may not be reflective of population shifts. 
+Without considering additional factors, this graph appears to show a decline in the number of urchins observed across the sites over this time period. In each of the sites besides Isla Vista Reef - where observation only began in 2012 - urchin observations peaked between 2008 and 2012. To determine if these changes reflect actual changes in the population of purple urchins in Santa Barbara, one would have to be sure that these samples are an accurate representation of the full population. For example, it is possible that only the urchins in these locations were declining while they were increasing elsewhere. To get a better sense of how representative this sample is, researchers could calculate a confidence interval on various characteristics of the urchins. It would also be helpful to identify any additional variables like shifting environmental conditions at specific locations or study design differences that could help justify that these observations are accurate and have a likelihood to be true for the wider population. 
 
-## End Task 3
+# **End Task 3**
